@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DominoPontaDeQuina.Core", "DominoPontaDeQuina.Core\DominoPontaDeQuina.Core.csproj", "{45CCEAB0-D948-403B-982C-29D5CFD8173D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DominoPontaDeQuina.Domain", "DominoPontaDeQuina.Domain\DominoPontaDeQuina.Domain.csproj", "{64B1E88D-D6B1-4FAC-AC52-1C0FA8ED7BCB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DominoPontaDeQuina.Migrations", "DominoPontaDeQuina.Migrations\DominoPontaDeQuina.Migrations.csproj", "{D8B28C28-69EC-4292-B721-8ACFE2D77723}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DominoPontaDeQuina.Repository", "DominoPontaDeQuina.Repository\DominoPontaDeQuina.Repository.csproj", "{FC4CF20F-D3B1-4AD6-9974-28CB8E94E7D3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DominoPontaDeQuina.Tests", "DominoPontaDeQuina.Tests\DominoPontaDeQuina.Tests.csproj", "{C163654D-DE32-4858-8BD3-3BAD1249943E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{45CCEAB0-D948-403B-982C-29D5CFD8173D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45CCEAB0-D948-403B-982C-29D5CFD8173D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45CCEAB0-D948-403B-982C-29D5CFD8173D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45CCEAB0-D948-403B-982C-29D5CFD8173D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64B1E88D-D6B1-4FAC-AC52-1C0FA8ED7BCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64B1E88D-D6B1-4FAC-AC52-1C0FA8ED7BCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64B1E88D-D6B1-4FAC-AC52-1C0FA8ED7BCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64B1E88D-D6B1-4FAC-AC52-1C0FA8ED7BCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8B28C28-69EC-4292-B721-8ACFE2D77723}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8B28C28-69EC-4292-B721-8ACFE2D77723}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8B28C28-69EC-4292-B721-8ACFE2D77723}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8B28C28-69EC-4292-B721-8ACFE2D77723}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC4CF20F-D3B1-4AD6-9974-28CB8E94E7D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC4CF20F-D3B1-4AD6-9974-28CB8E94E7D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC4CF20F-D3B1-4AD6-9974-28CB8E94E7D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC4CF20F-D3B1-4AD6-9974-28CB8E94E7D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C163654D-DE32-4858-8BD3-3BAD1249943E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C163654D-DE32-4858-8BD3-3BAD1249943E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C163654D-DE32-4858-8BD3-3BAD1249943E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C163654D-DE32-4858-8BD3-3BAD1249943E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {736D9115-1F34-4A73-BAE1-FAE8CDC92D84}
+	EndGlobalSection
+EndGlobal

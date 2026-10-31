@@ -1,0 +1,27 @@
+digraph DominoCP6Client {
+  graph [rankdir=LR, bgcolor="white", pad="0.25", nodesep="0.48", ranksep="0.78", fontname="Segoe UI", label="Checkpoint 6 — Diagrama de classes do cliente", labelloc=t, fontsize=20];
+  node [shape=record, style="rounded,filled", fillcolor="#F4F7FB", color="#B5C4D4", fontname="Segoe UI", fontsize=10, margin="0.12,0.08"];
+  edge [color="#61768B", fontname="Segoe UI", fontsize=9, arrowsize=0.8];
+
+  IndexModel [label="{IndexModel|+ Email : string\l+ Token : string\l+ JogadorId : string\l+ PartidaId : string\l+ EstadoAtual : GameStateSnapshot\l|+ OnPostSolicitarTokenAsync()\l+ OnPostAtivarPerfilAsync()\l+ OnPostCriarPartidaAsync()\l+ OnPostJogarAsync()\l+ OnPostComprarAsync()\l+ OnPostPassarAsync()\l+ OnPostAcaoAutonomaAsync()\l}", fillcolor="#E6F0FF", color="#7DA6E8"];
+  DominoApiClient [label="{DominoApiClient|+ SendAsync() : Task de ApiCallResult\l+ FormatError() : string\l}"];
+  ApiCallResult [label="{ApiCallResult|+ StatusCode : HttpStatusCode\l+ RawBody : string\l+ Json : JsonNode\l+ IsSuccess : bool\l+ IsNoContent : bool\l}"];
+  GameStateParser [label="{GameStateSnapshot / Parser|+ Parse(json, jogadorId)\l}"];
+  GameStateSnapshot [label="{GameStateSnapshot|+ MinhaMao : lista de DominoPieceView\l+ Mesa : lista de DominoPieceView\l+ Pontas : int?\l+ Versao : long?\l+ MinhaVez : bool?\l+ PodeComprar : bool\l+ PodePassar : bool\l}"];
+  DominoPieceView [label="{DominoPieceView|+ ValorA : int\l+ ValorB : int\l+ Soma : int\l+ Label : string\l}"];
+  DominoAutonomousPlayer [label="{DominoAutonomousPlayer|+ Decide(state) : AutonomousDecision\l}", fillcolor="#E8F7F0", color="#82BCA4"];
+  AutonomousDecision [label="{AutonomousDecision|+ Type : string\l+ Piece : DominoPieceView?\l+ Side : int?\l+ Message : string\l}"];
+  ProtectedClientStore [label="{ProtectedClientStore|+ Read() : PersistedClientData\l+ Save(data) : void\l+ Clear() : void\l}", fillcolor="#FFF4E3", color="#E4B56A"];
+  PersistedClientData [label="{PersistedClientData|+ Email : string?\l+ Token : string?\l+ JogadorId : string?\l+ ActivationKey : string?\l+ ProfileActive : bool\l+ PartidaId : string?\l}"];
+
+  IndexModel -> DominoApiClient [label="chama API"];
+  IndexModel -> ProtectedClientStore [label="guarda credenciais cifradas"];
+  IndexModel -> GameStateSnapshot [label="apresenta estado"];
+  IndexModel -> DominoAutonomousPlayer [label="pede decisão"];
+  DominoApiClient -> ApiCallResult [label="retorna"];
+  GameStateSnapshot -> GameStateParser [style=dashed, arrowhead=none, label="interpretado por"];
+  GameStateSnapshot -> DominoPieceView [label="contém mão e mesa"];
+  DominoAutonomousPlayer -> AutonomousDecision [label="produz"];
+  AutonomousDecision -> DominoPieceView [label="seleciona"];
+  ProtectedClientStore -> PersistedClientData [label="cifra e persiste"];
+}

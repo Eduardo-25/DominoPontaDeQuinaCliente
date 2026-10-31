@@ -1,0 +1,275 @@
+@page
+@model DominoPontaDeQuina.Client.Pages.IndexModel
+@{
+    ViewData["Title"] = "Dominó Ponta de Quina · Cliente CP6";
+}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+<div class="app-shell">
+    <header class="topbar">
+        <div class="brand-mark">DQ</div>
+        <div>
+            <p class="eyebrow">CHECKPOINT 6 · FIAP</p>
+            <h1>Dominó Ponta de Quina</h1>
+            <p class="subtitle">Cliente web para jogar pela API oficial</p>
+        </div>
+        <div class="topbar-status"><span class="status-dot"></span> API remota configurada</div>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Feedback))
+    {
+        <div class="notice" role="status">@Model.Feedback</div>
+    }
+
+    <main>
+        <section class="intro-row">
+            <div>
+                <p class="eyebrow">CONEXÃO</p>
+                <h2>Prepare seu acesso</h2>
+                <p class="muted">O servidor oficial é a fonte da verdade. Uma jogada só é considerada realizada quando a API confirma a resposta.</p>
+            </div>
+            <div class="api-url">
+                <span>Base URL</span>
+                <a href="@Model.ApiBaseUrl" target="_blank" rel="noreferrer">@Model.ApiBaseUrl</a>
+                <a href="@(Model.ApiBaseUrl.TrimEnd('/') + "/swagger")" target="_blank" rel="noreferrer">Abrir Swagger oficial ↗</a>
+            </div>
+        </section>
+
+        <section class="steps-grid">
+            <article class="panel">
+                <div class="section-heading"><span class="step-number">01</span><div><h3>Solicitar token</h3><p>O token é enviado ao seu e-mail FIAP.</p></div></div>
+                <form method="post" asp-page-handler="SolicitarToken" class="form-stack">
+                    <label for="Email">E-mail FIAP</label>
+                    <input id="Email" name="Email" type="email" value="@Model.Email" placeholder="aluno@fiap.com.br" required />
+                    <button type="submit" class="button button-primary">Solicitar acesso</button>
+                </form>
+                <form method="post" asp-page-handler="GuardarToken" class="form-stack compact-top">
+                    <label for="Token">Token recebido por e-mail</label>
+                    <input id="Token" name="Token" type="password" value="@Model.Token" autocomplete="off" placeholder="Cole o token da API" required />
+                    <button type="submit" class="button button-secondary">Guardar token nesta sessão</button>
+                </form>
+                <p class="hint">O endpoint de solicitação retorna <code>202 Accepted</code>; a resposta não contém o token.</p>
+            </article>
+
+            <article class="panel">
+                <div class="section-heading"><span class="step-number">02</span><div><h3>Selecionar e ativar perfil</h3><p>Uma chave de ativação exclusiva identifica este cliente.</p></div></div>
+                <form method="post" asp-page-handler="ListarJogadores" class="form-stack">
+                    <button type="submit" class="button button-secondary" disabled="@(!Model.TemToken)">Listar perfis da conta</button>
+                </form>
+                @if (!string.IsNullOrWhiteSpace(Model.JogadoresJson))
+                {
+                    <details class="json-details"><summary>Perfis retornados pela API</summary><pre>@Model.JogadoresJson</pre></details>
+                }
+                <form method="post" asp-page-handler="SelecionarPerfil" class="form-stack compact-top">
+                    <label for="JogadorId">ID do jogador-perfil</label>
+                    <input id="JogadorId" name="JogadorId" value="@Model.JogadorId" placeholder="UUID do perfil" required />
+                    <button type="submit" class="button button-secondary">Selecionar perfil</button>
+                </form>
+                <div class="button-row compact-top">
+                    <form method="post" asp-page-handler="AtivarPerfil" class="inline-form">
+                        <input type="hidden" name="JogadorId" value="@Model.JogadorId" />
+                        <button type="submit" class="button button-primary" disabled="@(!Model.TemToken || string.IsNullOrWhiteSpace(Model.JogadorId))">Ativar neste cliente</button>
+                    </form>
+                    <form method="post" asp-page-handler="DesativarPerfil" class="inline-form">
+                        <input type="hidden" name="JogadorId" value="@Model.JogadorId" />
+                        <button type="submit" class="button button-danger" disabled="@(!Model.TemPerfilAtivado)">Liberar perfil</button>
+                    </form>
+                </div>
+                <p class="hint">@Model.ActivationStatus A chave de 64 caracteres hexadecimais é gerada pelo cliente e não é exibida.</p>
+            </article>
+        </section>
+
+        <section class="game-layout">
+            <div class="main-column">
+                <article class="panel">
+                    <div class="section-heading"><span class="step-number">03</span><div><h3>Sala de partidas</h3><p>Crie uma partida ou entre em uma mesa disponível.</p></div></div>
+                    <div class="game-actions-grid">
+                        <form method="post" asp-page-handler="CriarPartida" class="form-stack">
+                            <label for="PontuacaoAlvo">Pontuação-alvo</label>
+                            <input id="PontuacaoAlvo" name="PontuacaoAlvo" type="number" min="1" value="@Model.PontuacaoAlvo" required />
+                            <input type="hidden" name="JogadorId" value="@Model.JogadorId" />
+                            <button type="submit" class="button button-primary" disabled="@(!Model.TemPerfilAtivado)">Criar partida</button>
+                        </form>
+                        <form method="post" asp-page-handler="ListarPartidas" class="form-stack">
+                            <label>Partidas disponíveis</label>
+                            <p class="muted small">Consultar mesas listadas pela API.</p>
+                            <button type="submit" class="button button-secondary" disabled="@(!Model.TemToken)">Atualizar lista</button>
+                        </form>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(Model.PartidasJson))
+                    {
+                        <details class="json-details" open><summary>Resposta de partidas (copie o ID da mesa desejada)</summary><pre>@Model.PartidasJson</pre></details>
+                    }
+                    <form method="post" asp-page-handler="EntrarPartida" class="join-row">
+                        <input type="hidden" name="JogadorId" value="@Model.JogadorId" />
+                        <label for="PartidaId">ID da partida</label>
+                        <input id="PartidaId" name="PartidaId" value="@Model.PartidaId" placeholder="UUID da partida" required />
+                        <button type="submit" class="button button-primary" disabled="@(!Model.TemPerfilAtivado)">Ingressar</button>
+                    </form>
+                    @if (!string.IsNullOrWhiteSpace(Model.LastCreatedGameInfo))
+                    {
+                        <p class="notice inline-notice">@Model.LastCreatedGameInfo</p>
+                    }
+                    <div class="button-row compact-top">
+                        <form method="post" asp-page-handler="IniciarPartida" class="inline-form">
+                            <input type="hidden" name="JogadorId" value="@Model.JogadorId" />
+                            <input type="hidden" name="PartidaId" value="@Model.PartidaId" />
+                            <button type="submit" class="button button-secondary" disabled="@(!Model.TemPerfilAtivado || string.IsNullOrWhiteSpace(Model.PartidaId))">Iniciar partida</button>
+                        </form>
+                        <form method="post" asp-page-handler="AtualizarEstado" class="inline-form">
+                            <input type="hidden" name="JogadorId" value="@Model.JogadorId" />
+                            <input type="hidden" name="PartidaId" value="@Model.PartidaId" />
+                            <button type="submit" class="button button-secondary" disabled="@(!Model.TemPerfilAtivado || string.IsNullOrWhiteSpace(Model.PartidaId))">Atualizar estado</button>
+                        </form>
+                        <form method="post" asp-page-handler="ConsultarAtualizacoes" class="inline-form" id="pollForm">
+                            <input type="hidden" name="JogadorId" value="@Model.JogadorId" />
+                            <input type="hidden" name="PartidaId" value="@Model.PartidaId" />
+                            <button type="submit" class="button button-secondary" disabled="@(!Model.TemPerfilAtivado || string.IsNullOrWhiteSpace(Model.PartidaId))">Consultar atualizações</button>
+                        </form>
+                        <form method="post" asp-page-handler="AlternarAtualizacao" class="inline-form">
+                            <button type="submit" class="button @(Model.AutoAtualizar ? "button-danger" : "button-secondary")" disabled="@(!Model.TemPerfilAtivado || string.IsNullOrWhiteSpace(Model.PartidaId))">@(Model.AutoAtualizar ? "Desativar atualização automática" : "Ativar atualização automática")</button>
+                        </form>
+                    </div>
+                    <p class="hint">Atualização automática consulta o endpoint de atualizações a cada 5 segundos. Desative-a quando não precisar acompanhar a partida.</p>
+                </article>
+
+                <article class="panel table-panel">
+                    <div class="section-heading"><span class="step-number">04</span><div><h3>Mesa e mão própria</h3><p>Somente a mão do perfil selecionado deve ser exibida.</p></div></div>
+                    <div class="status-grid">
+                        <div class="stat"><span>Situação</span><strong>@Model.EstadoAtual.Situacao</strong></div>
+                        <div class="stat"><span>Próxima ação</span><strong>@Model.EstadoAtual.ProximaAcao</strong></div>
+                        <div class="stat"><span>Turno</span><strong>@Model.EstadoAtual.Turno</strong></div>
+                        <div class="stat"><span>Versão de estado</span><strong>@Model.VersaoEstado</strong></div>
+                        <div class="stat"><span>Placar</span><strong>@Model.EstadoAtual.Placar</strong></div>
+                        <div class="stat"><span>Peças do adversário</span><strong>@Model.EstadoAtual.PedrasAdversario</strong></div>
+                        <div class="stat"><span>Pontas</span><strong>@(Model.EstadoAtual.PontaEsquerda?.ToString() ?? "?") — @(Model.EstadoAtual.PontaDireita?.ToString() ?? "?")</strong></div>
+                    </div>
+                    <div class="board-wrap">
+                        <div class="board-label"><span class="board-dot"></span>MESA OFICIAL</div>
+                        @if (Model.EstadoAtual.Mesa.Count > 0)
+                        {
+                            <div class="domino-row board-domino-row">
+                                @foreach (var peca in Model.EstadoAtual.Mesa)
+                                {
+                                    <div class="domino" title="Peça da mesa"><span>@peca.ValorA</span><i></i><span>@peca.ValorB</span></div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="empty-board">A mesa será desenhada quando o formato da resposta da API for reconhecido.</div>
+                        }
+                    </div>
+                    <div class="hand-section">
+                        <div class="board-label"><span class="hand-dot"></span>MINHA MÃO</div>
+                        @if (Model.EstadoAtual.MinhaMao.Count > 0)
+                        {
+                            <div class="domino-row hand-domino-row">
+                                @foreach (var peca in Model.EstadoAtual.MinhaMao)
+                                {
+                                    <div class="domino hand-domino" title="Peça da sua mão"><span>@peca.ValorA</span><i></i><span>@peca.ValorB</span></div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="muted small">As pedras não puderam ser identificadas automaticamente no formato retornado. A resposta privada não é exibida em bruto para evitar revelar a mão de outro participante.</p>
+                        }
+                    </div>
+                    <div class="privacy-note"><strong>Privacidade:</strong> este cliente não renderiza o JSON completo do estado da partida. Ele tenta apresentar apenas as peças da sua mão e as peças públicas da mesa.</div>
+                </article>
+            </div>
+
+            <aside class="side-column">
+                <article class="panel action-panel">
+                    <div class="section-heading"><span class="step-number">05</span><div><h3>Enviar jogada</h3><p>O servidor valida a ação e o turno.</p></div></div>
+                    <form method="post" asp-page-handler="Jogar" class="form-stack">
+                        <input type="hidden" name="JogadorId" value="@Model.JogadorId" />
+                        <input type="hidden" name="PartidaId" value="@Model.PartidaId" />
+                        <div class="two-fields">
+                            <div><label for="ValorA">Valor A</label><input id="ValorA" name="ValorA" type="number" min="0" max="6" value="@Model.ValorA" required /></div>
+                            <div><label for="ValorB">Valor B</label><input id="ValorB" name="ValorB" type="number" min="0" max="6" value="@Model.ValorB" required /></div>
+                        </div>
+                        <label for="Lado">Ponta escolhida</label>
+                        <select id="Lado" name="Lado"><option value="0" selected="@(Model.Lado == 0)">Esquerda (0)</option><option value="1" selected="@(Model.Lado == 1)">Direita (1)</option></select>
+                        <button type="submit" class="button button-primary button-wide" disabled="@(!Model.TemPerfilAtivado || string.IsNullOrWhiteSpace(Model.PartidaId))">Enviar jogada</button>
+                    </form>
+                    <div class="button-row vertical-buttons">
+                        <form method="post" asp-page-handler="Comprar">
+                            <input type="hidden" name="JogadorId" value="@Model.JogadorId" /><input type="hidden" name="PartidaId" value="@Model.PartidaId" />
+                            <button type="submit" class="button button-secondary button-wide" disabled="@(!Model.TemPerfilAtivado || string.IsNullOrWhiteSpace(Model.PartidaId))">Comprar peça</button>
+                        </form>
+                        <form method="post" asp-page-handler="Passar">
+                            <input type="hidden" name="JogadorId" value="@Model.JogadorId" /><input type="hidden" name="PartidaId" value="@Model.PartidaId" />
+                            <button type="submit" class="button button-secondary button-wide" disabled="@(!Model.TemPerfilAtivado || string.IsNullOrWhiteSpace(Model.PartidaId))">Passar a vez</button>
+                        </form>
+                    </div>
+                    <p class="hint">Comprar e passar só funcionam quando a API permitir. Rejeições HTTP 409/422 não são tratadas como jogadas realizadas.</p>
+                </article>
+
+                <article class="panel autonomous-panel">
+                    <div class="bot-icon">✦</div>
+                    <p class="eyebrow">JOGADOR AUTÔNOMO</p>
+                    <h3>Decisão automática</h3>
+                    <p class="muted small">Heurística local: tenta identificar sua mão e as pontas, escolhe uma peça compatível e consulta a API. Se o estado não permitir decisão confiável, não envia ação.</p>
+                    <form method="post" asp-page-handler="AlternarJogadorAutonomo" class="form-stack">
+                        <input type="hidden" name="JogadorId" value="@Model.JogadorId" /><input type="hidden" name="PartidaId" value="@Model.PartidaId" />
+                        <button type="submit" class="button @(Model.AutoJogador ? "button-danger" : "button-accent") button-wide" disabled="@(!Model.TemPerfilAtivado || string.IsNullOrWhiteSpace(Model.PartidaId))">@(Model.AutoJogador ? "Pausar jogador autônomo" : "Iniciar jogador autônomo")</button>
+                    </form>
+                    <form method="post" asp-page-handler="AcaoAutonoma" class="compact-top" id="autoStepForm">
+                        <input type="hidden" name="JogadorId" value="@Model.JogadorId" /><input type="hidden" name="PartidaId" value="@Model.PartidaId" />
+                        <button type="submit" class="button button-secondary button-wide" disabled="@(!Model.TemPerfilAtivado || string.IsNullOrWhiteSpace(Model.PartidaId))">Executar uma decisão agora</button>
+                    </form>
+                    <p class="hint"><strong>Status:</strong> @Model.AutoStatus</p>
+                    <p class="hint">Enquanto ativo, o agente consulta o estado a cada 5 segundos e tenta agir somente quando reconhece a vez e uma ação permitida. A API continua sendo a autoridade final.</p>
+                </article>
+
+                <article class="panel">
+                    <div class="section-heading"><span class="step-number">06</span><div><h3>Resultado</h3><p>Consulte o estado final oficial.</p></div></div>
+                    <form method="post" asp-page-handler="ConsultarResultado">
+                        <input type="hidden" name="JogadorId" value="@Model.JogadorId" /><input type="hidden" name="PartidaId" value="@Model.PartidaId" />
+                        <button type="submit" class="button button-secondary button-wide" disabled="@(!Model.TemPerfilAtivado || string.IsNullOrWhiteSpace(Model.PartidaId))">Consultar resultado</button>
+                    </form>
+                    @if (!string.IsNullOrWhiteSpace(Model.ResultadoJson))
+                    {
+                        <details class="json-details"><summary>Resultado retornado pela API</summary><pre>@Model.ResultadoJson</pre></details>
+                    }
+                </article>
+            </aside>
+        </section>
+
+        <footer class="footer-row">
+            <p>Checkpoint 6 · Cliente da API oficial de Dominó Ponta de Quina</p>
+            <form method="post" asp-page-handler="LimparSessao" onsubmit="return confirm('Limpar o token e a seleção locais? Isso não desativa o perfil na API.');">
+                <button type="submit" class="link-button">Limpar sessão local</button>
+            </form>
+        </footer>
+    </main>
+</div>
+@if (Model.AutoAtualizar && !string.IsNullOrWhiteSpace(Model.PartidaId) && Model.TemPerfilAtivado)
+{
+    <script>
+        window.setTimeout(() => {
+            const form = document.getElementById('pollForm');
+            if (form) form.requestSubmit();
+        }, 5000);
+    </script>
+}
+@if (Model.AutoJogador && !string.IsNullOrWhiteSpace(Model.PartidaId) && Model.TemPerfilAtivado)
+{
+    <script>
+        window.setTimeout(() => {
+            const form = document.getElementById('autoStepForm');
+            if (form) form.requestSubmit();
+        }, 5000);
+    </script>
+}
+</body>
+</html>

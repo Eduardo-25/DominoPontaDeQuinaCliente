@@ -1,0 +1,20 @@
+sequenceDiagram
+    actor Usuario
+    participant Cliente as Cliente Web
+    participant API as API oficial
+    participant Email as E-mail FIAP
+    Usuario->>Cliente: Informa e-mail
+    Cliente->>API: POST /api/identidade/token
+    API-->>Cliente: 202 Accepted
+    API->>Email: Envia token
+    Email-->>Usuario: Token
+    Usuario->>Cliente: Cola token
+    Cliente->>API: Authorization: Bearer token
+    Usuario->>Cliente: Seleciona jogadorId
+    Cliente->>Cliente: Gera chave de 64 hexadecimais
+    Cliente->>API: POST /api/jogadores/{id}/ativar-cliente
+    API-->>Cliente: Confirma ativação
+    Cliente->>Cliente: Guarda chave protegida
+    Cliente->>API: Consultas e ações + Bearer + X-Jogador-Ativacao
+    API-->>Cliente: Estado autoritativo / erro HTTP
+    Cliente->>Usuario: Atualiza a mesa somente após confirmação

@@ -1,0 +1,87 @@
+classDiagram
+    class IndexModel {
+      +Email string
+      +Token string
+      +JogadorId string
+      +PartidaId string
+      +OnPostSolicitarTokenAsync()
+      +OnPostAtivarPerfilAsync()
+      +OnPostCriarPartidaAsync()
+      +OnPostJogarAsync()
+      +OnPostComprarAsync()
+      +OnPostPassarAsync()
+      +OnPostAcaoAutonomaAsync()
+    }
+
+    class DominoApiClient {
+      +SendAsync(method, path, token, activationKey, body)
+      +FormatError(result)
+    }
+
+    class ApiCallResult {
+      +StatusCode HttpStatusCode
+      +RawBody string
+      +Json JsonNode
+      +IsSuccess bool
+      +IsNoContent bool
+    }
+
+    class GameStateParser {
+      +Parse(json, jogadorId) GameStateSnapshot
+    }
+
+    class GameStateSnapshot {
+      +MinhaMao List~DominoPieceView~
+      +Mesa List~DominoPieceView~
+      +PontaEsquerda int?
+      +PontaDireita int?
+      +Versao long?
+      +MinhaVez bool?
+      +PodeComprar bool
+      +PodePassar bool
+    }
+
+    class DominoPieceView {
+      +ValorA int
+      +ValorB int
+      +Soma int
+      +Label string
+    }
+
+    class DominoAutonomousPlayer {
+      +Decide(state) AutonomousDecision
+    }
+
+    class AutonomousDecision {
+      +Type string
+      +Piece DominoPieceView
+      +Side int?
+      +Message string
+    }
+
+    class ProtectedClientStore {
+      +Read() PersistedClientData
+      +Save(data)
+      +Clear()
+    }
+
+    class PersistedClientData {
+      +Email string
+      +Token string
+      +JogadorId string
+      +ActivationKey string
+      +ActivationPlayerId string
+      +ProfileActive bool
+      +PartidaId string
+    }
+
+    IndexModel --> DominoApiClient : consome API
+    IndexModel --> ProtectedClientStore : persiste credenciais
+    IndexModel --> GameStateParser : interpreta estado
+    IndexModel --> DominoAutonomousPlayer : solicita decisão
+    DominoApiClient --> ApiCallResult : retorna
+    GameStateParser --> GameStateSnapshot : constrói
+    GameStateSnapshot o-- DominoPieceView : mão própria e mesa
+    DominoAutonomousPlayer --> AutonomousDecision : decide
+    AutonomousDecision --> DominoPieceView : peça escolhida
+    ProtectedClientStore --> PersistedClientData : cifra e persiste

@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="DominoPontaDeQuina.Api/DominoPontaDeQuina.Api.csproj" />
+  <Project Path="DominoPontaDeQuina.Application/DominoPontaDeQuina.Application.csproj" />
+  <Project Path="DominoPontaDeQuina.Client.Tests/DominoPontaDeQuina.Client.Tests.csproj" />
+  <Project Path="DominoPontaDeQuina.Client/DominoPontaDeQuina.Client.csproj" />
+  <Project Path="DominoPontaDeQuina.Core/DominoPontaDeQuina.Core.csproj" />
+  <Project Path="DominoPontaDeQuina.Domain/DominoPontaDeQuina.Domain.csproj" />
+  <Project Path="DominoPontaDeQuina.Repository/DominoPontaDeQuina.Repository.csproj" />
+  <Project Path="DominoPontaDeQuina.Migrations/DominoPontaDeQuina.Migrations.csproj" />
+  <Project Path="DominoPontaDeQuina.Tests/DominoPontaDeQuina.Tests.csproj" />
+</Solution>

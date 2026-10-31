@@ -1,0 +1,20 @@
+digraph AuthFlow {
+  graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.28", ranksep="0.45", fontname="Segoe UI", label="Checkpoint 6 — Fluxo de autenticação e ativação", labelloc=t, fontsize=20];
+  node [shape=box, style="rounded,filled", fillcolor="#F4F7FB", color="#B5C4D4", fontname="Segoe UI", fontsize=10, margin="0.15,0.10"];
+  edge [color="#61768B", fontname="Segoe UI", fontsize=9, arrowsize=0.8];
+
+  start [label="Usuário informa e-mail FIAP", fillcolor="#E6F0FF", color="#7DA6E8"];
+  token [label="POST /api/identidade/token\n{ email }"];
+  accepted [label="API responde 202 Accepted\nToken não vem no corpo"];
+  email [label="Token chega por e-mail"];
+  save [label="Usuário cola token no cliente\nAuthorization: Bearer <token>"];
+  select [label="Listar e selecionar jogadorId"];
+  key [label="Gerar chave aleatória\n64 caracteres hexadecimais"];
+  activate [label="POST /api/jogadores/{id}/ativar-cliente\n{ chaveAtivacao }"];
+  confirmed [label="API confirma ativação\nSalvar chave local cifrada", fillcolor="#E8F7F0", color="#82BCA4"];
+  actions [label="Chamadas privadas\nBearer + X-Jogador-Ativacao"];
+  failure [label="Em caso de rejeição: mostrar erro\nsem afirmar que a ação foi concluída", fillcolor="#FFF4E3", color="#E4B56A"];
+
+  start -> token -> accepted -> email -> save -> select -> key -> activate -> confirmed -> actions;
+  actions -> failure [label="rejeição HTTP", style=dashed];
+}
