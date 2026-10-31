@@ -69,7 +69,7 @@ Execute a partir da pasta `DominoPontaDeQuina.Client.Tests`:
 dotnet test
 ```
 
-## Verificação antes da entrega
+## Execução do cliente
 
 Execute localmente os comandos abaixo, pois a compilação e uma partida real dependem do SDK .NET e do acesso à API no ambiente de desenvolvimento:
 
@@ -78,7 +78,3 @@ dotnet build DominoPontaDeQuina.Client/DominoPontaDeQuina.Client.csproj
 dotnet test DominoPontaDeQuina.Client.Tests/DominoPontaDeQuina.Client.Tests.csproj
 dotnet run --project DominoPontaDeQuina.Client/DominoPontaDeQuina.Client.csproj
 ```
-
-Depois, teste o fluxo completo com dois perfis diferentes: ativar, criar/ingressar na mesa, iniciar, jogar, comprar ou passar quando permitido, acompanhar o placar e consultar o resultado. Capture evidências da interface, da mesa durante o turno e do jogador autônomo.
-
-**Nota de integração:** o projeto foi montado com base nos endpoints e exemplos visíveis na apresentação fornecida. Não foi possível validar chamadas reais contra o Swagger remoto neste ambiente. Se o contrato atual exigir um corpo de requisição diferente ou expuser nomes de propriedades diferentes, ajuste o método correspondente usando o Swagger oficial antes da apresentação.

@@ -21,6 +21,8 @@ Estevam Melo (RM: 555124)
 - `DominoPontaDeQuina.Application`: camada de serviços para usuários, jogadores, partidas, participações e autenticação.
 - `DominoPontaDeQuina.Api`: Web API REST com controllers, injeção de dependência, Swagger e autenticação JWT.
 - `DominoPontaDeQuina.Tests`: testes automatizados utilizando xUnit, FluentAssertions e Moq.
+- `DominoPontaDeQuina.Client`: aplicação web ASP.NET Core Razor Pages (.NET 8) desenvolvida para o Checkpoint 6. Consome a API oficial do professor e disponibiliza interface para autenticação, gerenciamento de partidas e execução de jogadas.
+- `DominoPontaDeQuina.Client.Tests`: projeto de testes automatizados do cliente, incluindo interpretação do estado da partida, privacidade da mão do jogador e decisões do jogador autônomo.
 
 ## Arquitetura
 
@@ -33,6 +35,8 @@ O projeto utiliza uma arquitetura em camadas para separar as responsabilidades:
 - `Api`: endpoints HTTP e autenticação.
 - `Migrations`: versionamento do esquema do banco de dados.
 - `Tests`: validação automatizada das regras e dos serviços.
+- `Client`: aplicação web responsável pela interface do jogador e pela comunicação com a API oficial do dominó.
+- `Client.Tests`: testes automatizados das funcionalidades do cliente.
 
 A injeção de dependência conecta os serviços aos repositórios e ao contexto do Entity Framework Core.
 
@@ -46,7 +50,7 @@ Os relacionamentos são configurados com Fluent API no `DominoDbContext`. O banc
 
 A classe `Jogo`, presente no projeto Core, faz parte do fluxo de execução do jogo e é distinta da entidade persistente `Partida`, presente no projeto Domain.
 
-## API REST e autenticação
+## API REST própria da solução e autenticação(local)
 
 A API disponibiliza endpoints para operações de usuários, jogadores, partidas e participações em partidas.
 
@@ -55,6 +59,43 @@ O Swagger permite consultar e executar as operações documentadas. A autentica�
 O fluxo básico de autenticação consiste em cadastrar um usuário, realizar login com e-mail e senha, receber um token JWT e utilizá-lo no botão `Authorize` do Swagger para acessar os endpoints protegidos.
 
 As senhas são armazenadas utilizando hash por meio de `IPasswordHasher<Usuario>`, em vez de serem persistidas em texto puro.
+
+## Cliente Web
+
+O projeto `DominoPontaDeQuina.Client` implementa um cliente web utilizando ASP.NET Core Razor Pages e .NET 8.
+
+Diferentemente da API própria da solução, o cliente consome a API oficial, responsável pelas regras e pelo estado autoritativo das partidas.
+
+Principais funcionalidades:
+
+- Solicitação de token por e-mail e autenticação.
+- Listagem, seleção e ativação de perfis de jogadores.
+- Criação e ingresso em partidas.
+- Inicialização e consulta do estado da partida.
+- Visualização da mesa e da própria mão.
+- Envio de jogadas, compras e passagens.
+- Atualização automática do estado da partida.
+- Consulta do resultado oficial.
+- Jogador autônomo baseado em heurísticas locais.
+
+**API oficial:**
+
+https://domino-quina-api-b1-pf2261.azurewebsites.net/
+
+**Swagger:**
+
+https://domino-quina-api-b1-pf2261.azurewebsites.net/swagger
+
+**Executar o cliente:**
+
+```bash
+dotnet run --project DominoPontaDeQuina.Client/DominoPontaDeQuina.Client.csproj
+```
+Após iniciar, acesse:
+
+http://localhost:5187/
+
+Para conhecer o fluxo completo de utilização, autenticação, ativação e testes, consulte o README do cliente web.
 
 ## Pré-requisitos
 
@@ -100,8 +141,6 @@ dotnet ef migrations list --project DominoPontaDeQuina.Migrations --startup-proj
 
 Substitua `NomeDaMigration` por um nome que descreva a alteração realizada no modelo.
 
-O banco SQLite local `domino.db` é mantido na raiz da solução e ignorado pelo Git.
-
 ## Executar a API
 
 Para iniciar a aplicação:
@@ -111,8 +150,6 @@ dotnet run --project DominoPontaDeQuina.Api/DominoPontaDeQuina.Api.csproj
 ```
 
 Utilize o endereço informado no terminal para acessar a aplicação. Em ambiente de desenvolvimento, o Swagger fica disponível no caminho `/swagger`.
-
-As configurações de JWT estão no arquivo `appsettings.json` do projeto API. Em produção, a chave secreta deve ser armazenada de forma segura e não deve ser versionada no repositório.
 
 ## Testes automatizados
 
@@ -136,4 +173,12 @@ Para executar todos os testes da solução:
 
 ```bash
 dotnet test DominoPontaDeQuina.slnx --verbosity minimal
+```
+Os testes automatizados do cliente estão no projeto
+`DominoPontaDeQuina.Client.Tests`.
+
+Para executá-los:
+
+```bash
+dotnet test DominoPontaDeQuina.Client.Tests/DominoPontaDeQuina.Client.Tests.csproj --verbosity minimal
 ```
